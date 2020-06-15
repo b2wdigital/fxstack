@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/b2wdigital/fxstack/domain/model"
 	"github.com/b2wdigital/fxstack/transport/client/kinesis/mocks"
 	giconfig "github.com/b2wdigital/goignite/config"
 	"github.com/b2wdigital/goignite/errors"
@@ -31,7 +30,7 @@ func (s *ClientSuite) TestClient_Publish() {
 	event.SetSource("changeme")
 	event.SetType("changeme")
 	event.SetExtension("group", "changeme")
-	event.SetData("", &model.Product{})
+	event.SetData("", nil)
 
 	options, _ := DefaultOptions()
 
