@@ -8,7 +8,6 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
-	logger "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 )
 
@@ -45,6 +44,9 @@ func NewHandler() cloudevents.Handler {
 }
 
 func (*Handler) Handle(parentCtx context.Context, in v2.Event) (out *v2.Event, err error) {
+
+	logger := gilog.FromContext(parentCtx)
+
 	e := v2.NewEvent()
 	e.SetSubject("changeme")
 	e.SetSource("changeme")
@@ -55,7 +57,7 @@ func (*Handler) Handle(parentCtx context.Context, in v2.Event) (out *v2.Event, e
 		return nil, errors.Wrap(err, errors.Internalf("unable set out event data"))
 	}
 
-	logger.Debug("persisted event")
+	logger.Info("persisted event")
 
 	return &e, nil
 }

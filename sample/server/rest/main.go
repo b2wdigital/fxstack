@@ -65,5 +65,10 @@ func NewHandler() *Handler {
 }
 
 func (*Handler) Handle(c echo.Context) (err error) {
+
+	logger := gilog.FromContext(c.Request().Context())
+
+	logger.Info("example of request")
+
 	return giecho.JSON(c, http.StatusOK, nil, err)
 }
