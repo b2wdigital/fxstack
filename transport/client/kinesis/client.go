@@ -43,7 +43,7 @@ func (c *client) Publish(ctx context.Context, input *kinesis.PutRecordInput) err
 
 	d2 := int64(c.options.Timeout / time.Millisecond)
 	logger.WithField("timeout", strconv.FormatInt(d2, 10)).
-		Tracef("sending message to kinesis")
+		Tracef("sending message to kinesis with timeout: %s", strconv.FormatInt(d2, 10))
 
 	response, err := request.Send(reqCtx)
 	if err != nil {
@@ -73,7 +73,8 @@ func (c *client) BulkPublish(ctx context.Context, messages []kinesis.PutRecordsR
 	defer cancel()
 
 	d2 := int64(c.options.Timeout / time.Millisecond)
-	logger.Debugf("sending bulk message to kinesis with timeout: %s", strconv.FormatInt(d2, 10))
+	logger.WithField("timeout", strconv.FormatInt(d2, 10)).
+		Debugf("sending bulk message to kinesis with timeout: %s", strconv.FormatInt(d2, 10))
 
 	response, err := request.Send(reqCtx)
 	if err != nil {
@@ -85,26 +86,38 @@ func (c *client) BulkPublish(ctx context.Context, messages []kinesis.PutRecordsR
 		logger.Warnf("Error on publishing bulk messages. total errors: %v / %v",
 			*response.FailedRecordCount, len(messages))
 
-		var retry []kinesis.PutRecordsRequestEntry
+	}
 
-		for i, r := range response.PutRecordsOutput.Records {
+	var retry []kinesis.PutRecordsRequestEntry
 
-			if r.ErrorMessage != nil {
-				retry = append(retry, messages[i])
-			}
+	for i, r := range response.PutRecordsOutput.Records {
 
+		if r.ErrorMessage != nil {
+			logger.
+				WithField("cause", r.ErrorMessage).
+				WithField("code", r.ErrorCode).
+				Warn("error in kinesis bulk record")
+			retry = append(retry, messages[i])
+			continue
 		}
 
-		if len(retry) > 0 {
+		logger.
+			WithField("sequence_number", *r.SequenceNumber).
+			WithField("shard_id", *r.ShardId).
+			Debug("message sent to kinesis")
 
-			logger.Warnf("Retrying publish bulk messages. messages: %v", len(retry))
+	}
 
-			err := c.BulkPublish(ctx, retry, resource)
-			if err != nil {
-				return err
-			}
+	if len(retry) > 0 {
 
+		logger.Warnf("Retrying publish %v messages", len(retry))
+
+		err := c.BulkPublish(ctx, retry, resource)
+		if err != nil {
+			logger.WithField("cause", err.Error()).Warn("error in kinesis bulk record")
+			return err
 		}
+
 	}
 
 	return nil
