@@ -7,7 +7,6 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
-	"golang.org/x/sync/errgroup"
 )
 
 type HandlerWrapper struct {
@@ -33,7 +32,7 @@ func (h *HandlerWrapper) closeAll(parentCtx context.Context) error {
 
 	for _, middleware := range h.middlewares {
 
-		logger.Tracef("executing event middleware %s.AfterAll()", reflect.TypeOf(middleware).String())
+		logger.Tracef("executing event middleware %s.Close()", reflect.TypeOf(middleware).String())
 
 		var err error
 		err = middleware.Close(ctx)
@@ -130,56 +129,46 @@ func (h *HandlerWrapper) Process(parentCtx context.Context, inouts []*InOut) (er
 
 func (h *HandlerWrapper) handleAll(parentCtx context.Context, inouts []*InOut) {
 
-	g, gctx := errgroup.WithContext(parentCtx)
-
 	for _, inout := range inouts {
+		logger := gilog.FromContext(parentCtx)
 
-		inout := inout
+		in := inout.In
+		if in == nil {
+			logger.Warn("discarding inout.In == nil")
+			continue
+		}
 
-		g.Go(func() error {
+		l := logger.
+			WithField("event.id", in.ID()).
+			WithField("event.parentId", in.Extensions()["parentId"]).
+			WithField("event.source", in.Source()).
+			WithField("event.type", in.Type())
 
-			ctx, cancel := context.WithCancel(parentCtx)
-			defer cancel()
+		if inout.Err != nil {
+			l.WithField("cause", inout.Err.Error()).Warn("discarding message due to error")
+			inout.Err = nil
+			continue
+		}
 
-			logger := gilog.FromContext(ctx)
+		ctxx := l.ToContext(parentCtx)
 
-			in := inout.In
+		ctxx, err := h.before(ctxx, h.middlewares, in)
+		if err != nil {
+			l.WithField("cause", err.Error()).Warn("could not execute h.before")
+		}
 
-			l := logger.
-				WithField("event.id", in.ID()).
-				WithField("event.parentId", in.Extensions()["parentId"]).
-				WithField("event.source", in.Source()).
-				WithField("event.type", in.Type())
+		out, err := h.handler.Handle(ctxx, *in)
+		if err != nil {
+			inout.Err = errors.Wrap(err, errors.Internalf("unable process event"))
+		}
+		inout.Out = out
+		inout.Context = ctxx
 
-			ctxx := l.ToContext(parentCtx)
-
-			ctxx, err := h.before(ctxx, h.middlewares, in)
-			if err != nil {
-				return err
-			}
-
-			out, err := h.handler.Handle(ctxx, *in)
-			if err != nil {
-				inout.Err = errors.Wrap(err, errors.Internalf("unable process event"))
-			}
-			inout.Out = out
-			inout.Context = ctxx
-
-			_, err = h.after(ctxx, h.middlewares, *in, out, inout.Err)
-			if err != nil {
-				return err
-			}
-
-			return nil
-
-		})
+		_, err = h.after(ctxx, h.middlewares, *in, out, inout.Err)
+		if err != nil {
+			l.WithField("cause", err.Error()).Warn("could not execute h.after")
+		}
 	}
-
-	if err := g.Wait(); err != nil {
-		gilog.FromContext(parentCtx).WithTypeOf(*h).Error(errors.ErrorStack(err))
-	}
-
-	gctx.Done()
 }
 
 func (h *HandlerWrapper) before(ctx context.Context, middlewares []Middleware, in *v2.Event) (context.Context, error) {

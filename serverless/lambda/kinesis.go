@@ -9,7 +9,6 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
-	"golang.org/x/sync/errgroup"
 )
 
 func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
@@ -21,59 +20,38 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 	var inouts []*cloudevents.InOut
 
-	g, gctx := errgroup.WithContext(parentCtx)
-
 	j, _ := json.Marshal(event)
 	gilog.Debug(string(j))
 
 	for _, record := range event.Records {
+		var err error
+		in := v2.NewEvent()
 
-		record := record
+		if err = json.Unmarshal(record.Kinesis.Data, &in); err != nil {
+			var data interface{}
 
-		g.Go(func() error {
-
-			var err error
-
-			in := v2.NewEvent()
-
-			if err = json.Unmarshal(record.Kinesis.Data, &in); err != nil {
-
-				var data interface{}
-
-				if err = json.Unmarshal(record.Kinesis.Data, &data); err != nil {
+			if err = json.Unmarshal(record.Kinesis.Data, &data); err != nil {
+				err = errors.NewNotValid(err, "could not decode kinesis record")
+			} else {
+				if err = in.SetData("", data); err != nil {
 					err = errors.NewNotValid(err, "could not decode kinesis record")
-				} else {
-					if err = in.SetData("", data); err != nil {
-						err = errors.NewNotValid(err, "could not decode kinesis record")
-					}
 				}
 			}
+		}
 
-			in.SetType(record.EventName)
+		in.SetType(record.EventName)
 
-			in.SetID(record.EventID)
-			in.SetSource(record.EventSource)
+		in.SetID(record.EventID)
+		in.SetSource(record.EventSource)
 
-			in.SetExtension("awsRequestID", lc.AwsRequestID)
-			in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
+		in.SetExtension("awsRequestID", lc.AwsRequestID)
+		in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
 
-			inouts = append(inouts, &cloudevents.InOut{
-				In:  &in,
-				Err: err,
-			})
-
-			return nil
-
+		inouts = append(inouts, &cloudevents.InOut{
+			In:  &in,
+			Err: err,
 		})
-
 	}
-
-	if err := g.Wait(); err == nil {
-		logger.Debug("all events converted")
-	}
-
-	gctx.Done()
 
 	return inouts
-
 }
