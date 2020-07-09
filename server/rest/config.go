@@ -9,6 +9,7 @@ import (
 const (
 	liveEnabled = "fxstack.server.rest.live.enabled"
 	livePort    = "fxstack.server.rest.live.port"
+	livePath    = "fxstack.server.rest.live.path"
 )
 
 func init() {
@@ -17,6 +18,7 @@ func init() {
 
 	giconfig.Add(liveEnabled, false, "live enable/disable")
 	giconfig.Add(livePort, 8081, "live port")
+	giconfig.Add(livePath, "/live", "live path")
 }
 
 func LiveEnabled() bool {
@@ -25,4 +27,8 @@ func LiveEnabled() bool {
 
 func LivePort() int {
 	return giconfig.Int(livePort)
+}
+
+func LivePath() string {
+	return giconfig.String(livePath)
 }

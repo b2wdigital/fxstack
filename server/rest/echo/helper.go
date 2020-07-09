@@ -67,7 +67,7 @@ func (h *Helper) Serve() {
 		}()
 
 		liveSrv := http.NewServeMux()
-		liveSrv.HandleFunc("/liveHandler", liveHandler)
+		liveSrv.HandleFunc(rest.LivePath(), liveHandler)
 		go func() {
 			http.ListenAndServe(livePort(), liveSrv)
 		}()
