@@ -3,7 +3,9 @@ package echo
 import (
 	"context"
 	"net/http"
+	"strconv"
 
+	"github.com/b2wdigital/fxstack/server/rest"
 	giecho "github.com/b2wdigital/goignite/echo/v4"
 	gilog "github.com/b2wdigital/goignite/log"
 	"github.com/labstack/echo/v4"
@@ -55,21 +57,31 @@ func addRoute(ctx context.Context, route *Route, e *echo.Echo) {
 }
 
 func (h *Helper) Serve() {
-	finish := make(chan bool)
 
-	go func() {
+	if rest.LiveEnabled() {
+
+		finish := make(chan bool)
+
+		go func() {
+			giecho.Serve(h.ctx)
+		}()
+
+		liveSrv := http.NewServeMux()
+		liveSrv.HandleFunc("/liveHandler", liveHandler)
+		go func() {
+			http.ListenAndServe(livePort(), liveSrv)
+		}()
+
+		<-finish
+	} else {
 		giecho.Serve(h.ctx)
-	}()
-
-	liveSrv := http.NewServeMux()
-	liveSrv.HandleFunc("/live", live)
-	go func() {
-		http.ListenAndServe(":8081", liveSrv)
-	}()
-
-	<-finish
+	}
 }
 
-func live(w http.ResponseWriter, r *http.Request) {
+func liveHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("is alived"))
+}
+
+func livePort() string {
+	return ":" + strconv.Itoa(rest.LivePort())
 }

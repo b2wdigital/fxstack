@@ -10,6 +10,7 @@ import (
 	gilog "github.com/b2wdigital/goignite/log"
 	gizerolog "github.com/b2wdigital/goignite/log/zerolog/v1"
 	"github.com/spf13/cobra"
+	_ "go.uber.org/automaxprocs"
 	"go.uber.org/fx"
 )
 
