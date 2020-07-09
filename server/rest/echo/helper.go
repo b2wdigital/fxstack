@@ -55,5 +55,21 @@ func addRoute(ctx context.Context, route *Route, e *echo.Echo) {
 }
 
 func (h *Helper) Serve() {
-	giecho.Serve(h.ctx)
+	finish := make(chan bool)
+
+	go func() {
+		giecho.Serve(h.ctx)
+	}()
+
+	liveSrv := http.NewServeMux()
+	liveSrv.HandleFunc("/live", live)
+	go func() {
+		http.ListenAndServe(":8081", liveSrv)
+	}()
+
+	<-finish
+}
+
+func live(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("is alived"))
 }
