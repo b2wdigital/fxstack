@@ -7,20 +7,25 @@ import (
 )
 
 const (
-	MiddlewareNewRelicEnabled       = "fxstack.cloudevents.middleware.newrelic.enabled"
-	MiddlewareNewRelicTxName        = "fxstack.cloudevents.middleware.newrelic.txname"
-	MiddlewareLogEnabled            = "fxstack.cloudevents.middleware.log.enabled"
-	MiddlewareEventPublisherEnabled = "fxstack.cloudevents.middleware.eventpublisher.enabled"
+	cloudeventsConfig = "pkg.cloudevents"
+
+	MiddlewareNewRelicEnabled       = cloudeventsConfig + ".middleware.newrelic.enabled"
+	MiddlewareNewRelicTxName        = cloudeventsConfig + ".middleware.newrelic.txname"
+	MiddlewareLogEnabled            = cloudeventsConfig + ".middleware.log.enabled"
+	MiddlewareEventPublisherEnabled = cloudeventsConfig + ".middleware.eventpublisher.enabled"
+
+	HandleDiscardEventsID = cloudeventsConfig + ".handle.discard_ids"
 )
 
 func init() {
 
-	log.Println("getting configurations for fxstack cloudevents")
+	log.Println("getting configurations for pkg cloudevents")
 
 	giconfig.Add(MiddlewareNewRelicEnabled, false, "cloudevents newrelic middleware enable/disable")
 	giconfig.Add(MiddlewareNewRelicTxName, "changeme", "cloudevents newrelic middleware tx name")
 	giconfig.Add(MiddlewareLogEnabled, true, "cloudevents log middleware enable/disable")
 	giconfig.Add(MiddlewareEventPublisherEnabled, true, "cloudevents event publisher middleware enable/disable")
+	giconfig.Add(HandleDiscardEventsID, "", "cloudevents events id that will not be processed, comma separated")
 }
 
 func MiddlewareNewRelicEnabledValue() bool {
@@ -37,4 +42,8 @@ func MiddlewareLogEnabledValue() bool {
 
 func MiddlewareEventPublisherEnabledValue() bool {
 	return giconfig.Bool(MiddlewareEventPublisherEnabled)
+}
+
+func HandleDiscardEventsIDValue() string {
+	return giconfig.String(HandleDiscardEventsID)
 }

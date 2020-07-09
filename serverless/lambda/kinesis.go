@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
+	"github.com/b2wdigital/fxstack/cloudevents"
 )
 
 func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
@@ -41,7 +41,10 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 		in.SetType(record.EventName)
 
-		in.SetID(record.EventID)
+		if in.ID() == "" {
+			in.SetID(record.EventID)
+		}
+
 		in.SetSource(record.EventSource)
 
 		in.SetExtension("awsRequestID", lc.AwsRequestID)

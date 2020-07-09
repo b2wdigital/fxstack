@@ -3,9 +3,9 @@ package nats
 import (
 	"context"
 
-	"github.com/b2wdigital/fxstack/cloudevents"
 	gilog "github.com/b2wdigital/goignite/log"
 	ginats "github.com/b2wdigital/goignite/nats/v1"
+	"github.com/b2wdigital/fxstack/cloudevents"
 )
 
 type Helper struct {
@@ -14,16 +14,11 @@ type Helper struct {
 	q       *ginats.Queue
 }
 
-func NewHelper(ctx context.Context, q *ginats.Queue, options *Options, handler cloudevents.Handler,
-	middlewares []cloudevents.Middleware) (*Helper, error) {
-
-	logger := gilog.FromContext(ctx)
-	logger.Debugf("loading %v middlewares on nats listener helper", len(middlewares))
-
-	h := cloudevents.NewHandlerWrapper(handler, middlewares...)
+func NewHelper(ctx context.Context, q *ginats.Queue, options *Options,
+	handler *cloudevents.HandlerWrapper) (*Helper, error) {
 
 	return &Helper{
-		handler: h,
+		handler: handler,
 		queue:   options.Queue,
 		q:       q,
 	}, nil

@@ -4,23 +4,18 @@ import (
 	"context"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
+	"github.com/b2wdigital/fxstack/cloudevents"
 )
 
 type Handler struct {
-	handler     *cloudevents.HandlerWrapper
-	middlewares []cloudevents.Middleware
-	options     *Options
+	handler *cloudevents.HandlerWrapper
+	options *Options
 }
 
-func NewHandler(handler cloudevents.Handler, middlewares []cloudevents.Middleware, options *Options) *Handler {
-
-	gilog.Debugf("loading %v middlewares on lambda helper", len(middlewares))
-
-	h := cloudevents.NewHandlerWrapper(handler, middlewares...)
-	return &Handler{handler: h, middlewares: middlewares, options: options}
+func NewHandler(handler *cloudevents.HandlerWrapper, options *Options) *Handler {
+	return &Handler{handler: handler, options: options}
 }
 
 // Handler handles a event

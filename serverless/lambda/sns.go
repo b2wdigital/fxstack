@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
+	"github.com/b2wdigital/fxstack/cloudevents"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -50,7 +50,11 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 			}
 
 			in.SetType(record.SNS.Type)
-			in.SetID(record.SNS.MessageID)
+
+			if in.ID() == "" {
+				in.SetID(record.SNS.MessageID)
+			}
+
 			in.SetSource(record.EventSource)
 
 			in.SetExtension("awsRequestID", lc.AwsRequestID)

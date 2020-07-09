@@ -54,8 +54,8 @@ func (m *EventPublisher) AfterAll(ctx context.Context, inouts []*cloudevents.InO
 
 			id := uuid.New()
 
-			out.SetID(id.String())
 			out.SetExtension("parentId", in.ID())
+			out.SetID(id.String())
 			out.SetTime(time.Now())
 
 			for key, value := range in.Extensions() {

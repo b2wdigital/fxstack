@@ -1,6 +1,7 @@
 package lambda
 
 import (
+	fxlambda "github.com/b2wdigital/fxstack/fx/lambda"
 	"github.com/b2wdigital/fxstack/fx/module/cloudevents"
 	"github.com/b2wdigital/fxstack/serverless/lambda"
 	gilog "github.com/b2wdigital/goignite/log"
@@ -15,7 +16,7 @@ func HelperModule() fx.Option {
 		cloudevents.MiddlewaresModule(),
 		fx.Provide(
 			lambda.DefaultOptions,
-			NewHelper,
+			fxlambda.NewHelper,
 		),
 	)
 }
