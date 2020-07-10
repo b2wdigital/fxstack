@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/b2wdigital/fxstack/server/rest"
 	giecho "github.com/b2wdigital/goignite/echo/v4"
@@ -60,19 +61,22 @@ func (h *Helper) Serve() {
 
 	if rest.LiveEnabled() {
 
-		finish := make(chan bool)
+		wg := new(sync.WaitGroup)
+		wg.Add(2)
 
 		go func() {
 			giecho.Serve(h.ctx)
+			wg.Done()
 		}()
 
 		liveSrv := http.NewServeMux()
 		liveSrv.HandleFunc(rest.LivePath(), liveHandler)
 		go func() {
-			http.ListenAndServe(livePort(), liveSrv)
+			gilog.Fatal(http.ListenAndServe(livePort(), liveSrv))
+			wg.Done()
 		}()
 
-		<-finish
+		wg.Wait()
 	} else {
 		giecho.Serve(h.ctx)
 	}
