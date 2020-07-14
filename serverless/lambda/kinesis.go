@@ -41,7 +41,10 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 		in.SetType(record.EventName)
 
-		in.SetID(record.EventID)
+		if in.ID() == "" {
+			in.SetID(record.EventID)
+		}
+
 		in.SetSource(record.EventSource)
 
 		in.SetExtension("awsRequestID", lc.AwsRequestID)

@@ -10,10 +10,9 @@ type Helper struct {
 	//smiddlewares []cloudevents.Middleware
 }
 
-func NewLambdaHelper(handler cloudevents.Handler, middlewares []cloudevents.Middleware,
-	options *Options) (*Helper, error) {
+func NewLambdaHelper(handler *cloudevents.HandlerWrapper, options *Options) (*Helper, error) {
 
-	h := NewHandler(handler, middlewares, options)
+	h := NewHandler(handler, options)
 
 	return &Helper{
 		handler: h,

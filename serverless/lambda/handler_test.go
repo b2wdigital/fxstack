@@ -97,7 +97,9 @@ func (s *HandlerSuite) TestHandler_Handle() {
 
 			tt.mock(tt.fields.handler)
 
-			h := NewHandler(tt.fields.handler, tt.fields.middlewares, tt.fields.options)
+			hwOptions, _ := cloudevents.DefaultOptions()
+			hw := cloudevents.NewHandlerWrapper(tt.fields.handler, hwOptions, tt.fields.middlewares...)
+			h := NewHandler(hw, tt.fields.options)
 
 			err := h.Handle(tt.args.ctx, tt.args.event)
 			if err != nil {
@@ -119,6 +121,8 @@ func (s *HandlerSuite) TestNewHandler() {
 
 	handler := new(mocks.Handler)
 	options, _ := DefaultOptions()
+	hwOptions, _ := cloudevents.DefaultOptions()
+	hw := cloudevents.NewHandlerWrapper(handler, hwOptions)
 
 	tests := []struct {
 		name string
@@ -132,13 +136,14 @@ func (s *HandlerSuite) TestNewHandler() {
 				middlewares: nil,
 				options:     options,
 			},
-			want: NewHandler(handler, nil, options),
+			want: NewHandler(hw, options),
 		},
 	}
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 
-			got := NewHandler(tt.args.handler, tt.args.middlewares, tt.args.options)
+			hw := cloudevents.NewHandlerWrapper(tt.args.handler, hwOptions, tt.args.middlewares...)
+			got := NewHandler(hw, tt.args.options)
 
 			s.Assert().True(reflect.DeepEqual(got, tt.want), "NewHandler() = %v, want %v")
 

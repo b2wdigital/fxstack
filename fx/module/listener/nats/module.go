@@ -1,21 +1,23 @@
-package lambda
+package nats
 
 import (
 	"github.com/b2wdigital/fxstack/fx/module/cloudevents"
-	"github.com/b2wdigital/fxstack/serverless/lambda"
+	"github.com/b2wdigital/fxstack/listener/nats"
 	gilog "github.com/b2wdigital/goignite/log"
+	ginats "github.com/b2wdigital/goignite/nats/v1"
 	"go.uber.org/fx"
 )
 
 func HelperModule() fx.Option {
 
-	gilog.Debug("loading lambda helper module")
+	gilog.Debug("loading listener nats module")
 
 	return fx.Options(
 		cloudevents.MiddlewaresModule(),
+		cloudevents.HandlerWrapperModule(),
 		fx.Provide(
-			lambda.DefaultOptions,
-			NewHelper,
+			ginats.NewDefaultQueue,
+			nats.DefaultOptions,
 		),
 	)
 }

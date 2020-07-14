@@ -50,7 +50,11 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 			}
 
 			in.SetType(record.SNS.Type)
-			in.SetID(record.SNS.MessageID)
+
+			if in.ID() == "" {
+				in.SetID(record.SNS.MessageID)
+			}
+
 			in.SetSource(record.EventSource)
 
 			in.SetExtension("awsRequestID", lc.AwsRequestID)

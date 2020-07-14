@@ -5,5 +5,5 @@ import (
 )
 
 func NewHelper(p Params) (*lambda.Helper, error) {
-	return lambda.NewLambdaHelper(p.Handler, p.Middlewares, p.Options)
+	return lambda.NewLambdaHelper(p.HandlerWrapper, p.Options)
 }

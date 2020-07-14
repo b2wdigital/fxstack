@@ -33,13 +33,6 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 			in := v2.NewEvent()
 
-			in.SetType(record.EventSource)
-			in.SetID(record.SQS.MessageId)
-			in.SetSource(record.EventSource)
-
-			in.SetExtension("awsRequestID", lc.AwsRequestID)
-			in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
-
 			if err = json.Unmarshal([]byte(record.SQS.Body), &in); err != nil {
 				var data interface{}
 
@@ -51,6 +44,17 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 					}
 				}
 			}
+
+			in.SetType(record.EventSource)
+
+			if in.ID() == "" {
+				in.SetID(record.SQS.MessageId)
+			}
+
+			in.SetSource(record.EventSource)
+
+			in.SetExtension("awsRequestID", lc.AwsRequestID)
+			in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
 
 			inouts = append(inouts, &cloudevents.InOut{
 				In:  &in,
