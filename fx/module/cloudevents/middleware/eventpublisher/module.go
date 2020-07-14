@@ -15,7 +15,7 @@ func MiddlewareLogModule() fx.Option {
 			provider.EventModule(),
 			fx.Provide(
 				fx.Annotated{
-					Group:  "helper",
+					Group:  "cloudevents_middlewares",
 					Target: middleware.NewEventPublisher,
 				},
 			),
