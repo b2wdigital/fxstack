@@ -24,7 +24,13 @@ func (p *Client) Publish(ctx context.Context, outs []*v2.Event) (err error) {
 
 	logger := gilog.FromContext(ctx).WithTypeOf(*p)
 
+	logger.Info("publishing to nats")
+
 	for _, out := range outs {
+
+		logger = logger.
+			WithField("subject", out.Subject()).
+			WithField("id", out.ID())
 
 		var rawMessage []byte
 
@@ -49,21 +55,18 @@ func (p *Client) Publish(ctx context.Context, outs []*v2.Event) (err error) {
 			} else {
 				rawMessage, err = cloudevents.JSONBytes(*out)
 			}
+
 		} else {
 			rawMessage, err = cloudevents.JSONBytes(*out)
 		}
 
 		if err != nil {
 			err = errors.Wrap(err, errors.Internalf("error when transforming json into bytes"))
-			logger.WithTypeOf(*p).Error(errors.ErrorStack(err))
+			logger.Error(errors.ErrorStack(err))
 			continue
 		}
 
-		logger.Info("publishing to nats")
-
-		logger.WithField("subject", out.Subject()).
-			WithField("id", out.ID()).
-			Info(string(rawMessage))
+		logger.Info(string(rawMessage))
 
 		msg := &nats.Msg{
 			Subject: out.Subject(),
@@ -73,7 +76,7 @@ func (p *Client) Publish(ctx context.Context, outs []*v2.Event) (err error) {
 		err = p.publisher.Publish(ctx, msg)
 		if err != nil {
 			err = errors.Wrap(err, errors.Internalf("unable to publish to nats"))
-			logger.WithTypeOf(*p).Error(errors.ErrorStack(err))
+			logger.Error(errors.ErrorStack(err))
 		}
 
 	}
