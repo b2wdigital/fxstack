@@ -50,15 +50,12 @@ func (h *HandlerWrapper) afterAll(parentCtx context.Context, inouts []*InOut) er
 
 	logger := gilog.FromContext(parentCtx).WithTypeOf(*h)
 
-	ctx, cancel := context.WithCancel(parentCtx)
-	defer cancel()
-
 	for _, middleware := range h.middlewares {
 
 		logger.Tracef("executing event middleware %s.AfterAll()", reflect.TypeOf(middleware).String())
 
 		var err error
-		ctx, err = middleware.AfterAll(ctx, inouts)
+		parentCtx, err = middleware.AfterAll(parentCtx, inouts)
 		if err != nil {
 			err = errors.Wrap(err,
 				errors.Internalf("an error happened when calling AfterAll() method in %s middleware",
@@ -74,24 +71,21 @@ func (h *HandlerWrapper) beforeAll(parentCtx context.Context, inouts []*InOut) (
 
 	logger := gilog.FromContext(parentCtx).WithTypeOf(*h)
 
-	ctx, cancel := context.WithCancel(parentCtx)
-	defer cancel()
-
 	for _, middleware := range h.middlewares {
 
 		logger.Tracef("executing event middleware %s.BeforeAll()", reflect.TypeOf(middleware).String())
 
 		var err error
-		ctx, err = middleware.BeforeAll(ctx, inouts)
+		parentCtx, err = middleware.BeforeAll(parentCtx, inouts)
 		if err != nil {
 			err = errors.Wrap(err,
 				errors.Internalf("an error happened when calling BeforeAll() method in %s middleware",
 					reflect.TypeOf(middleware).String()))
-			return ctx, err
+			return parentCtx, err
 		}
 	}
 
-	return ctx, nil
+	return parentCtx, nil
 }
 
 func (h *HandlerWrapper) Process(parentCtx context.Context, inouts []*InOut) (err error) {
