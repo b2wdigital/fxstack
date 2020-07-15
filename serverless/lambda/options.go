@@ -12,7 +12,7 @@ func DefaultOptions() (*Options, error) {
 
 	o := &Options{}
 
-	err := giconfig.UnmarshalWithPath("pkg.serverless.lambda", o)
+	err := giconfig.UnmarshalWithPath("fxstack.serverless.lambda", o)
 	if err != nil {
 		return nil, err
 	}
