@@ -65,6 +65,7 @@ github.com/b2wdigital/goignite v1.0.10 h1:R79wIHRDD9/iV36FvfgW1A2CnLIpUDDsfoj9m9
 github.com/b2wdigital/goignite v1.0.10/go.mod h1:S8JNqy2MURjU5hjqT3tN+Uzn89V7Z2jdHuVurA5SPik=
 github.com/b2wdigital/goignite v1.0.12 h1:Uh5aCW/vhVXEwDyYPYGCaFqMYog0IHlffr7JwlNQsZc=
 github.com/b2wdigital/goignite v1.0.12/go.mod h1:yPBGGjg5MIXV0qf9FXCZ6V3XpAvEV5WiDnd3srmtf4U=
+github.com/b2wdigital/goignite v1.0.13 h1:zieG/fod3YuBFAmC9CpqD+H4ueyQqd1uSK/P/zI2wp8=
 github.com/b2wdigital/goignite v1.0.13/go.mod h1:X48gg3EaPmTvqD6DcxYLFt0VdR8j2yETqDpvQoziFnE=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
