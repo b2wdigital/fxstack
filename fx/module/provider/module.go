@@ -2,6 +2,7 @@ package provider
 
 import (
 	"github.com/b2wdigital/fxstack/domain/repository"
+	"github.com/b2wdigital/fxstack/fx/module/provider/eventbus"
 	"github.com/b2wdigital/fxstack/fx/module/provider/kinesis"
 	"github.com/b2wdigital/fxstack/fx/module/provider/mock"
 	"github.com/b2wdigital/fxstack/fx/module/provider/nats"
@@ -22,6 +23,8 @@ func EventModule() fx.Option {
 		mod = kinesis.EventModule
 	} else if value == "nats" {
 		mod = nats.EventModule
+	} else if value == "eventbus" {
+		mod = eventbus.EventModule
 	} else {
 		mod = mock.EventModule
 	}

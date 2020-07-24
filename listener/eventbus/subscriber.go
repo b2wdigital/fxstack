@@ -1,4 +1,4 @@
-package nats
+package eventbus
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gieventbus "github.com/b2wdigital/goignite/eventbus"
 	gilog "github.com/b2wdigital/goignite/log"
-	ginats "github.com/b2wdigital/goignite/nats/v1"
 	v2 "github.com/cloudevents/sdk-go/v2"
 )
 
@@ -17,8 +16,7 @@ type SubscriberListener struct {
 	subject string
 }
 
-func NewSubscriberListener(q *ginats.Queue, handler *cloudevents.HandlerWrapper, subject string,
-	queue string) *SubscriberListener {
+func NewSubscriberListener(handler *cloudevents.HandlerWrapper, subject string) *SubscriberListener {
 	return &SubscriberListener{
 		handler: handler,
 		subject: subject,

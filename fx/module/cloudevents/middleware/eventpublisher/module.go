@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func MiddlewareLogModule() fx.Option {
+func MiddlewareEventPublisherModule() fx.Option {
 
 	if cloudevents.MiddlewareEventPublisherEnabledValue() {
 

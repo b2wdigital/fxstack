@@ -17,7 +17,7 @@ func MiddlewaresModule() fx.Option {
 	return fx.Options(
 		log.MiddlewareLogModule(),
 		newrelic.MiddlewareNewRelicModule(),
-		eventpublisher.MiddlewareLogModule(),
+		eventpublisher.MiddlewareEventPublisherModule(),
 	)
 }
 
