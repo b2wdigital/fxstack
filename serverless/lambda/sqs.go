@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
@@ -30,7 +31,7 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 		g.Go(func() error {
 
 			j, _ := json.Marshal(record)
-			gilog.Debug(string(j))
+			logger.Debug(string(j))
 
 			var err error
 
@@ -38,14 +39,26 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 			if err = json.Unmarshal([]byte(record.Body), &in); err != nil {
 				var data interface{}
+				snsEvent := events.SNSEntity{}
 
-				if err = json.Unmarshal([]byte(record.Body), &data); err != nil {
-					err = errors.NewNotValid(err, "could not decode SQS record")
-				} else {
-					if err = in.SetData("", data); err != nil {
-						err = errors.NewNotValid(err, "could not set data in event")
-					}
+				if err = json.Unmarshal([]byte(record.Body), &snsEvent); err != nil {
+					return errors.NewNotValid(err, "could not decode SQS record")
+				} else if err = json.Unmarshal([]byte(record.Body), &data); err != nil {
+					return errors.NewNotValid(err, "could not decode SQS record")
 				}
+
+				if snsEvent.Message != "" {
+
+					if err = json.Unmarshal([]byte(snsEvent.Message), &data); err != nil {
+						return errors.NewNotValid(err, "could not decode SNS message from SQS record")
+					}
+
+				}
+
+				if err = in.SetData("", data); err != nil {
+					return errors.NewNotValid(err, "could not set data in event")
+				}
+
 			}
 
 			in.SetType(record.EventSource)

@@ -23,7 +23,7 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 	for _, record := range event.Records {
 
 		j, _ := json.Marshal(record)
-		gilog.Debug(string(j))
+		logger.Debug(string(j))
 
 		var err error
 		in := v2.NewEvent()

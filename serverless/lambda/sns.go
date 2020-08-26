@@ -30,7 +30,7 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 		g.Go(func() error {
 
 			j, _ := json.Marshal(record)
-			gilog.Debug(string(j))
+			logger.Debug(string(j))
 
 			var err error
 
