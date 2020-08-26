@@ -13,7 +13,7 @@ type Record struct {
 	EventName            string               `json:"eventName"`
 	EventID              string               `json:"eventID"`
 	SNS                  events.SNSEntity     `json:"sns"`
-	SQS                  events.SQSMessage    `json:"sqs"`
+	SQS                  events.SQSEvent      `json:"sqs"`
 	S3                   events.S3EventRecord `json:"s3"`
 	Kinesis              events.KinesisRecord `json:"kinesis"`
 }
