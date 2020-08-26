@@ -36,10 +36,10 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 			in := v2.NewEvent()
 
-			if err = json.Unmarshal([]byte(record.SQS.Body), &in); err != nil {
+			if err = json.Unmarshal([]byte(record.Body), &in); err != nil {
 				var data interface{}
 
-				if err = json.Unmarshal([]byte(record.SQS.Body), &data); err != nil {
+				if err = json.Unmarshal([]byte(record.Body), &data); err != nil {
 					err = errors.NewNotValid(err, "could not decode SQS record")
 				} else {
 					if err = in.SetData("", data); err != nil {
@@ -51,7 +51,7 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 			in.SetType(record.EventSource)
 
 			if in.ID() == "" {
-				in.SetID(record.SQS.MessageId)
+				in.SetID(record.MessageId)
 			}
 
 			in.SetSource(record.EventSource)
