@@ -34,7 +34,7 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 				err = errors.NewNotValid(err, "could not decode kinesis record")
 			} else {
 				if err = in.SetData("", data); err != nil {
-					err = errors.NewNotValid(err, "could not decode kinesis record")
+					err = errors.NewNotValid(err, "could not set data in event")
 				}
 			}
 		}

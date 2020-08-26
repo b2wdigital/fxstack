@@ -21,6 +21,9 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 	var inouts []*cloudevents.InOut
 
+	j, _ := json.Marshal(event)
+	gilog.Debug(string(j))
+
 	g, gctx := errgroup.WithContext(parentCtx)
 
 	for _, record := range event.Records {
@@ -40,10 +43,8 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 				if err = json.Unmarshal([]byte(record.SNS.Message), &data); err != nil {
 					err = errors.NewNotValid(err, "could not decode SNS record")
 				} else {
-
-					err = in.SetData("", data)
-					if err != nil {
-						err = errors.NewNotValid(err, "could not decode SNS record")
+					if err = in.SetData("", data); err != nil {
+						err = errors.NewNotValid(err, "could not set data in event")
 					}
 				}
 

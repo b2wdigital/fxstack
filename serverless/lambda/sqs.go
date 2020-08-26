@@ -21,6 +21,9 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 	var inouts []*cloudevents.InOut
 
+	j, _ := json.Marshal(event)
+	gilog.Debug(string(j))
+
 	g, gctx := errgroup.WithContext(parentCtx)
 
 	for _, record := range event.Records {
@@ -40,7 +43,7 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 					err = errors.NewNotValid(err, "could not decode SQS record")
 				} else {
 					if err = in.SetData("", data); err != nil {
-						err = errors.NewNotValid(err, "could not decode SQS record")
+						err = errors.NewNotValid(err, "could not set data in event")
 					}
 				}
 			}
