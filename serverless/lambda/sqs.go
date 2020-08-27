@@ -37,36 +37,36 @@ func fromSQS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 			in := v2.NewEvent()
 
-			if er := json.Unmarshal([]byte(record.Body), &in); er != nil {
-				err = errors.NewNotValid(er, "could not decode SQS record")
+			if err = json.Unmarshal([]byte(record.Body), &in); err != nil {
+				err = errors.NewNotValid(err, "could not decode SQS record")
 			} else {
 
 				var data interface{}
 
 				snsEvent := events.SNSEntity{}
 
-				if er := json.Unmarshal([]byte(record.Body), &snsEvent); er != nil {
-					err = errors.NewNotValid(er, "could not decode SQS record")
+				if err = json.Unmarshal([]byte(record.Body), &snsEvent); err != nil {
+					err = errors.NewNotValid(err, "could not decode SQS record")
 				} else {
 
 					if snsEvent.Message != "" {
 
-						if er := json.Unmarshal([]byte(snsEvent.Message), &data); er != nil {
-							err = errors.NewNotValid(er, "could not decode SNS message from SQS record")
+						if err = json.Unmarshal([]byte(snsEvent.Message), &data); err != nil {
+							err = errors.NewNotValid(err, "could not decode SNS message from SQS record")
 						}
 
 					} else {
 
-						if er = json.Unmarshal([]byte(record.Body), &data); er != nil {
-							err = errors.NewNotValid(er, "could not decode SQS record")
+						if err = json.Unmarshal([]byte(record.Body), &data); err != nil {
+							err = errors.NewNotValid(err, "could not decode SQS record")
 						}
 
 					}
 
 				}
 
-				if er := in.SetData("", data); er != nil {
-					err = errors.NewNotValid(er, "could not set data in event")
+				if err = in.SetData("", data); err != nil {
+					err = errors.NewNotValid(err, "could not set data in event")
 				}
 
 			}
