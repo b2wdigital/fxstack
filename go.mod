@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/aws/aws-sdk-go-v2 v0.20.0
-	github.com/b2wdigital/goignite v1.0.16
+	github.com/b2wdigital/goignite v1.0.17
 	github.com/cloudevents/sdk-go/v2 v2.0.0-preview8
 	github.com/google/uuid v1.1.1
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
