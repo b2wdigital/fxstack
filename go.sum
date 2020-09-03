@@ -65,9 +65,8 @@ github.com/aws/aws-sdk-go v1.29.15/go.mod h1:1KvfttTE3SPKMpo8g2c6jL3ZKfXtFvKscTg
 github.com/aws/aws-sdk-go-v2 v0.8.0/go.mod h1:sa1GePZ/LfBGI4dSq30f6uR4Tthll8axxtEPvlpXZ8U=
 github.com/aws/aws-sdk-go-v2 v0.20.0 h1:/yefUjgMrda9PNFwWctBU63nL10CJMdBwkAmaQ4w4Hs=
 github.com/aws/aws-sdk-go-v2 v0.20.0/go.mod h1:2LhT7UgHOXK3UXONKI5OMgIyoQL6zTAw/jwIeX6yqzw=
-github.com/b2wdigital/goignite v1.1.0 h1:E9zh9uDuzZf5V0N2PFeFfukBqnBYBdsCMXbBGd1WhSM=
-github.com/b2wdigital/goignite v1.1.0/go.mod h1:NR54wqpT3tkpzWOG05Dap/nm+oS/WhrxHOTDbJWOLLs=
-github.com/b2wdigital/goignite v1.2.0/go.mod h1:NR54wqpT3tkpzWOG05Dap/nm+oS/WhrxHOTDbJWOLLs=
+github.com/b2wdigital/goignite v1.2.1 h1:GQafDqMKQFtpG9UneEir9Ws6SWyb1iHdGJ67PWYj83s=
+github.com/b2wdigital/goignite v1.2.1/go.mod h1:NR54wqpT3tkpzWOG05Dap/nm+oS/WhrxHOTDbJWOLLs=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
