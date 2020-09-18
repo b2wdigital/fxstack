@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/aws/aws-sdk-go-v2 v0.20.0
-	github.com/b2wdigital/goignite v1.3.0
+	github.com/b2wdigital/goignite v1.3.1
 	github.com/cloudevents/sdk-go/v2 v2.0.0-preview8
 	github.com/google/uuid v1.1.1
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
@@ -15,7 +15,7 @@ require (
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/nats-server v1.4.1
 	github.com/nats-io/nats.go v1.9.2
-	github.com/newrelic/go-agent/v3 v3.4.0
+	github.com/newrelic/go-agent/v3 v3.9.0
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v1.0.0
