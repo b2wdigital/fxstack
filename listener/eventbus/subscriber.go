@@ -31,6 +31,10 @@ func (l *SubscriberListener) SubscribeOnce(ctx context.Context) error {
 	return gieventbus.SubscribeOnce(l.subject, l.h)
 }
 
+func (l *SubscriberListener) SubscribeOnceAsync(ctx context.Context) error {
+	return gieventbus.SubscribeOnceAsync(l.subject, l.h)
+}
+
 func (l *SubscriberListener) h(event []byte) {
 
 	in := v2.NewEvent()
