@@ -10,7 +10,7 @@ import (
 
 var EventModule = fx.Provide(
 	giaws.NewDefaultConfig,
-	kinesis.New,
+	kinesis.NewFromConfig,
 	transk.DefaultOptions,
 	transk.NewClient,
 	provk.DefaultOptions,

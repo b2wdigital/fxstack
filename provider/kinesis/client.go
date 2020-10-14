@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis"
+	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
@@ -50,7 +51,7 @@ func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
 
 	logger := gilog.FromContext(ctx).WithTypeOf(*p)
 
-	bulks := make(map[string][]kinesis.PutRecordsRequestEntry)
+	bulks := make(map[string][]*types.PutRecordsRequestEntry)
 
 	for _, out := range outs {
 
@@ -68,7 +69,7 @@ func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
 			return err
 		}
 
-		entry := kinesis.PutRecordsRequestEntry{
+		entry := &types.PutRecordsRequestEntry{
 			Data:         rawMessage,
 			PartitionKey: aws.String(partitionKey),
 		}
