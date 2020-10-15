@@ -20,7 +20,7 @@ func EventModule() fx.Option {
 	var mod fx.Option
 
 	if value == "kinesis" {
-		mod = kinesis.EventModule
+		mod = kinesis.EventModule()
 	} else if value == "nats" {
 		mod = nats.EventModule
 	} else if value == "eventbus" {
