@@ -38,11 +38,9 @@ func (p *Client) Publish(ctx context.Context, outs []*v2.Event) error {
 
 		return p.single(ctx, outs)
 
-	} else {
-
-		logger.Warnf("no messages were reported for posting")
-
 	}
+
+	logger.Warnf("no messages were reported for posting")
 
 	return nil
 }
