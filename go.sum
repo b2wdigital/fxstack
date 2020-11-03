@@ -123,8 +123,8 @@ github.com/aws/aws-sdk-go-v2/service/sts v0.28.0 h1:vT3BsN262uYMR2J4JC7oPbUwNvbn
 github.com/aws/aws-sdk-go-v2/service/sts v0.28.0/go.mod h1:AoXZmcouo9fCC1Ut7dUeBf2JiCjNFb0WOmgSEGnpuKY=
 github.com/awslabs/smithy-go v0.2.1 h1:guvR5teu1q6IoZnE9PFyPjxh/H7YEcZGysx9vu5ZwZ0=
 github.com/awslabs/smithy-go v0.2.1/go.mod h1:hPOQwnmBLHsUphH13tVSjQhTAFma0/0XoZGbBcOuABI=
-github.com/b2wdigital/goignite v1.9.0 h1:Hdb9pvmAg5P+5X7hsHJJvAY4VJkMoi7kzIyx8rTCc54=
-github.com/b2wdigital/goignite v1.9.0/go.mod h1:0V6zgT3mH0IHjy1/eaGqDq4JeXG2PhZCtjqtAT+2nJo=
+github.com/b2wdigital/goignite v1.9.1 h1:R3nzRNR/F5CWzgwr2wG7Y/RHhLBXvB3Ikcd//yLLmT8=
+github.com/b2wdigital/goignite v1.9.1/go.mod h1:0V6zgT3mH0IHjy1/eaGqDq4JeXG2PhZCtjqtAT+2nJo=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
