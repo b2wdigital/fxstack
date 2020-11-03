@@ -19,6 +19,7 @@ require (
 	github.com/nats-io/nats-server v1.4.1
 	github.com/nats-io/nats.go v1.9.2
 	github.com/newrelic/go-agent/v3 v3.9.0
+	github.com/prometheus/client_golang v1.7.1
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v1.0.0

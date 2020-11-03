@@ -9,7 +9,9 @@ import (
 	"github.com/b2wdigital/fxstack/server/rest"
 	giecho "github.com/b2wdigital/goignite/echo/v4"
 	gilog "github.com/b2wdigital/goignite/log"
+	gipromecho "github.com/b2wdigital/goignite/prometheus/v1/ext/promecho/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Helper struct {
@@ -71,6 +73,11 @@ func (h *Helper) Serve() {
 
 		liveSrv := http.NewServeMux()
 		liveSrv.HandleFunc(rest.LivePath(), liveHandler)
+
+		if gipromecho.IsEnabled() {
+			liveSrv.Handle(gipromecho.GetRoute(), promhttp.Handler())
+		}
+
 		go func() {
 			gilog.Fatal(http.ListenAndServe(livePort(), liveSrv))
 			wg.Done()
