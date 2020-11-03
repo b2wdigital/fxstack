@@ -52,7 +52,7 @@ func (c *client) Publish(ctx context.Context, input *kinesis.PutRecordInput) err
 	logger.
 		WithField("sequence_number", *response.SequenceNumber).
 		WithField("shard_id", *response.ShardId).
-		Debug("message sent to kinesis")
+		Info("message sent to kinesis")
 
 	return nil
 }
@@ -105,7 +105,7 @@ func (c *client) BulkPublish(ctx context.Context, entries []*types.PutRecordsReq
 			logger.
 				WithField("sequence_number", *r.SequenceNumber).
 				WithField("shard_id", *r.ShardId).
-				Debug("message sent to kinesis")
+				Info("message sent to kinesis")
 
 		}
 

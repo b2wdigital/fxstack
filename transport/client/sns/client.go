@@ -47,7 +47,7 @@ func (c *client) Publish(ctx context.Context, input *sns.PublishInput) error {
 
 	logger.
 		WithField("message_id", *response.MessageId).
-		Debug("message sent to sns")
+		Info("message sent to sns")
 
 	return nil
 }
