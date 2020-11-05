@@ -4,9 +4,9 @@ go 1.13
 
 require (
 	github.com/aws/aws-lambda-go v1.13.3
-	github.com/aws/aws-sdk-go-v2 v0.28.0
-	github.com/aws/aws-sdk-go-v2/service/kinesis v0.28.0
-	github.com/aws/aws-sdk-go-v2/service/sns v0.28.0
+	github.com/aws/aws-sdk-go-v2 v0.29.0
+	github.com/aws/aws-sdk-go-v2/service/kinesis v0.29.0
+	github.com/aws/aws-sdk-go-v2/service/sns v0.29.0
 	github.com/b2wdigital/goignite v1.11.0
 	github.com/cloudevents/sdk-go/v2 v2.0.0-preview8
 	github.com/google/uuid v1.1.1
