@@ -3,10 +3,15 @@ package echo
 import (
 	"context"
 	"net/http"
+	"strconv"
+	"sync"
 
+	"github.com/b2wdigital/fxstack/server/rest"
 	giecho "github.com/b2wdigital/goignite/echo/v4"
 	gilog "github.com/b2wdigital/goignite/log"
+	gipromecho "github.com/b2wdigital/goignite/prometheus/v1/ext/promecho/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Helper struct {
@@ -55,5 +60,39 @@ func addRoute(ctx context.Context, route *Route, e *echo.Echo) {
 }
 
 func (h *Helper) Serve() {
-	giecho.Serve(h.ctx)
+
+	if rest.LiveEnabled() {
+
+		wg := new(sync.WaitGroup)
+		wg.Add(2)
+
+		go func() {
+			giecho.Serve(h.ctx)
+			wg.Done()
+		}()
+
+		liveSrv := http.NewServeMux()
+		liveSrv.HandleFunc(rest.LivePath(), liveHandler)
+
+		if gipromecho.IsEnabled() {
+			liveSrv.Handle(gipromecho.GetRoute(), promhttp.Handler())
+		}
+
+		go func() {
+			gilog.Fatal(http.ListenAndServe(livePort(), liveSrv))
+			wg.Done()
+		}()
+
+		wg.Wait()
+	} else {
+		giecho.Serve(h.ctx)
+	}
+}
+
+func liveHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("is alived"))
+}
+
+func livePort() string {
+	return ":" + strconv.Itoa(rest.LivePort())
 }

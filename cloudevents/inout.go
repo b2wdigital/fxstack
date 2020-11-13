@@ -3,12 +3,12 @@ package cloudevents
 import (
 	"context"
 
-	v2 "github.com/cloudevents/sdk-go/v2"
+	"github.com/cloudevents/sdk-go/v2/event"
 )
 
 type InOut struct {
-	In      *v2.Event
-	Out     *v2.Event
+	In      *event.Event
+	Out     *event.Event
 	Err     error
 	Context context.Context
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
-	"golang.org/x/sync/errgroup"
 )
 
 func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
@@ -21,59 +20,42 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 	var inouts []*cloudevents.InOut
 
-	g, gctx := errgroup.WithContext(parentCtx)
-
-	j, _ := json.Marshal(event)
-	gilog.Debug(string(j))
-
 	for _, record := range event.Records {
 
-		record := record
+		j, _ := json.Marshal(record)
+		logger.Debug(string(j))
 
-		g.Go(func() error {
+		var err error
+		in := v2.NewEvent()
 
-			var err error
+		if err = json.Unmarshal(record.Kinesis.Data, &in); err != nil {
+			var data interface{}
 
-			in := v2.NewEvent()
-
-			if err = json.Unmarshal(record.Kinesis.Data, &in); err != nil {
-
-				var data interface{}
-
-				if err = json.Unmarshal(record.Kinesis.Data, &data); err != nil {
-					err = errors.NewNotValid(err, "could not decode kinesis record")
-				} else {
-					if err = in.SetData("", data); err != nil {
-						err = errors.NewNotValid(err, "could not decode kinesis record")
-					}
+			if err = json.Unmarshal(record.Kinesis.Data, &data); err != nil {
+				err = errors.NewNotValid(err, "could not decode kinesis record")
+			} else {
+				if err = in.SetData("", data); err != nil {
+					err = errors.NewNotValid(err, "could not set data in event")
 				}
 			}
+		}
 
-			in.SetType(record.EventName)
+		in.SetType(record.EventName)
 
+		if in.ID() == "" {
 			in.SetID(record.EventID)
-			in.SetSource(record.EventSource)
+		}
 
-			in.SetExtension("awsRequestID", lc.AwsRequestID)
-			in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
+		in.SetSource(record.EventSource)
 
-			inouts = append(inouts, &cloudevents.InOut{
-				In:  &in,
-				Err: err,
-			})
+		in.SetExtension("awsRequestID", lc.AwsRequestID)
+		in.SetExtension("invokedFunctionArn", lc.InvokedFunctionArn)
 
-			return nil
-
+		inouts = append(inouts, &cloudevents.InOut{
+			In:  &in,
+			Err: err,
 		})
-
 	}
-
-	if err := g.Wait(); err == nil {
-		logger.Debug("all events converted")
-	}
-
-	gctx.Done()
 
 	return inouts
-
 }
