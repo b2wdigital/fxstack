@@ -43,7 +43,7 @@ func (p *Client) Publish(ctx context.Context, outs []*v2.Event) (err error) {
 		}
 
 		if err != nil {
-			return attempt < 5, errors.NewInternal(err, "could not be published on kinesis")
+			return attempt < 5, errors.Wrap(err, errors.Internalf("could not be published on kinesis"))
 		}
 
 		return false, nil
@@ -93,7 +93,7 @@ func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
 	for subject, events := range bulks {
 		err := p.client.BulkPublish(ctx, events, subject)
 		if err != nil {
-			return errors.NewInternal(err, "could not be published in kinesis")
+			return errors.Wrap(err, errors.Internalf("could not be bulk publish in kinesis"))
 		}
 	}
 
@@ -133,7 +133,7 @@ func (p *Client) single(ctx context.Context, outs []*v2.Event) (err error) {
 
 	err = p.client.Publish(ctx, input)
 	if err != nil {
-		return errors.NewInternal(err, "could not be published in kinesis")
+		return errors.Wrap(err, errors.Internalf("could not be single publish in kinesis"))
 	}
 
 	return nil
