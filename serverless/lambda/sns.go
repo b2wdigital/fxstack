@@ -29,6 +29,9 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 		g.Go(func() error {
 
+			j, _ := json.Marshal(record)
+			logger.Debug(string(j))
+
 			var err error
 
 			in := v2.NewEvent()
@@ -40,17 +43,19 @@ func fromSNS(parentCtx context.Context, event Event) []*cloudevents.InOut {
 				if err = json.Unmarshal([]byte(record.SNS.Message), &data); err != nil {
 					err = errors.NewNotValid(err, "could not decode SNS record")
 				} else {
-
-					err = in.SetData("", data)
-					if err != nil {
-						err = errors.NewNotValid(err, "could not decode SNS record")
+					if err = in.SetData("", data); err != nil {
+						err = errors.NewNotValid(err, "could not set data in event")
 					}
 				}
 
 			}
 
 			in.SetType(record.SNS.Type)
-			in.SetID(record.SNS.MessageID)
+
+			if in.ID() == "" {
+				in.SetID(record.SNS.MessageID)
+			}
+
 			in.SetSource(record.EventSource)
 
 			in.SetExtension("awsRequestID", lc.AwsRequestID)

@@ -15,11 +15,11 @@ type KinesisClient struct {
 }
 
 // BulkPublish provides a mock function with given fields: ctx, messages
-func (_m *KinesisClient) BulkPublish(ctx context.Context, messages []kinesis.PutRecordsRequestEntry) error {
+func (_m *KinesisClient) BulkPublish(ctx context.Context, messages []kinesis.PutRecordInput) error {
 	ret := _m.Called(ctx, messages)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, []kinesis.PutRecordsRequestEntry) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []kinesis.PutRecordInput) error); ok {
 		r0 = rf(ctx, messages)
 	} else {
 		r0 = ret.Error(0)

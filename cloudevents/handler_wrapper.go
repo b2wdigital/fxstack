@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/b2wdigital/fxstack/util"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	v2 "github.com/cloudevents/sdk-go/v2"
@@ -12,30 +13,28 @@ import (
 type HandlerWrapper struct {
 	handler     Handler
 	middlewares []Middleware
+	options     *Options
 }
 
-func NewHandlerWrapper(handler Handler, middlewares ...Middleware) *HandlerWrapper {
+func NewHandlerWrapper(handler Handler, options *Options, middlewares ...Middleware) *HandlerWrapper {
 
 	if middlewares == nil {
 		middlewares = []Middleware{}
 	}
 
-	return &HandlerWrapper{handler: handler, middlewares: middlewares}
+	return &HandlerWrapper{handler: handler, middlewares: middlewares, options: options}
 }
 
 func (h *HandlerWrapper) closeAll(parentCtx context.Context) error {
 
 	logger := gilog.FromContext(parentCtx).WithTypeOf(*h)
 
-	ctx, cancel := context.WithCancel(parentCtx)
-	defer cancel()
-
 	for _, middleware := range h.middlewares {
 
 		logger.Tracef("executing event middleware %s.Close()", reflect.TypeOf(middleware).String())
 
 		var err error
-		err = middleware.Close(ctx)
+		err = middleware.Close(parentCtx)
 		if err != nil {
 			err = errors.Wrap(err, errors.Internalf("an error happened when calling Close() method in %s middleware",
 				reflect.TypeOf(middleware).String()))
@@ -50,15 +49,12 @@ func (h *HandlerWrapper) afterAll(parentCtx context.Context, inouts []*InOut) er
 
 	logger := gilog.FromContext(parentCtx).WithTypeOf(*h)
 
-	ctx, cancel := context.WithCancel(parentCtx)
-	defer cancel()
-
 	for _, middleware := range h.middlewares {
 
 		logger.Tracef("executing event middleware %s.AfterAll()", reflect.TypeOf(middleware).String())
 
 		var err error
-		ctx, err = middleware.AfterAll(ctx, inouts)
+		parentCtx, err = middleware.AfterAll(parentCtx, inouts)
 		if err != nil {
 			err = errors.Wrap(err,
 				errors.Internalf("an error happened when calling AfterAll() method in %s middleware",
@@ -74,24 +70,21 @@ func (h *HandlerWrapper) beforeAll(parentCtx context.Context, inouts []*InOut) (
 
 	logger := gilog.FromContext(parentCtx).WithTypeOf(*h)
 
-	ctx, cancel := context.WithCancel(parentCtx)
-	defer cancel()
-
 	for _, middleware := range h.middlewares {
 
 		logger.Tracef("executing event middleware %s.BeforeAll()", reflect.TypeOf(middleware).String())
 
 		var err error
-		ctx, err = middleware.BeforeAll(ctx, inouts)
+		parentCtx, err = middleware.BeforeAll(parentCtx, inouts)
 		if err != nil {
 			err = errors.Wrap(err,
 				errors.Internalf("an error happened when calling BeforeAll() method in %s middleware",
 					reflect.TypeOf(middleware).String()))
-			return ctx, err
+			return parentCtx, err
 		}
 	}
 
-	return ctx, nil
+	return parentCtx, nil
 }
 
 func (h *HandlerWrapper) Process(parentCtx context.Context, inouts []*InOut) (err error) {
@@ -144,9 +137,17 @@ func (h *HandlerWrapper) handleAll(parentCtx context.Context, inouts []*InOut) {
 			WithField("event.source", in.Source()).
 			WithField("event.type", in.Type())
 
+		l.Info("event received")
+
 		if inout.Err != nil {
 			l.WithField("cause", inout.Err.Error()).Warn("discarding message due to error")
 			inout.Err = nil
+			continue
+		}
+
+		hasToDiscardEvent := util.StringSliceContains(h.options.IDsToDiscard, in.ID())
+		if hasToDiscardEvent {
+			l.Warn("discarding event due to feature flag")
 			continue
 		}
 

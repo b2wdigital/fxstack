@@ -11,7 +11,7 @@ func MiddlewareNewRelicModule() fx.Option {
 	if cloudevents.MiddlewareNewRelicEnabledValue() {
 		return fx.Provide(
 			fx.Annotated{
-				Group:  "helper",
+				Group:  "cloudevents_middlewares",
 				Target: middleware.NewNewRelic,
 			},
 		)

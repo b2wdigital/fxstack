@@ -9,7 +9,6 @@ import (
 type Params struct {
 	fx.In
 
-	Handler     cloudevents.Handler
-	Middlewares []cloudevents.Middleware `group:"helper"`
-	Options     *lambda.Options
+	Options        *lambda.Options
+	HandlerWrapper *cloudevents.HandlerWrapper
 }

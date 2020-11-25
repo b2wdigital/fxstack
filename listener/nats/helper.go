@@ -14,16 +14,11 @@ type Helper struct {
 	q       *ginats.Queue
 }
 
-func NewHelper(ctx context.Context, q *ginats.Queue, options *Options, handler cloudevents.Handler,
-	middlewares []cloudevents.Middleware) (*Helper, error) {
-
-	logger := gilog.FromContext(ctx)
-	logger.Debugf("loading %v middlewares on nats listener helper", len(middlewares))
-
-	h := cloudevents.NewHandlerWrapper(handler, middlewares...)
+func NewHelper(ctx context.Context, q *ginats.Queue, options *Options,
+	handler *cloudevents.HandlerWrapper) (*Helper, error) {
 
 	return &Helper{
-		handler: h,
+		handler: handler,
 		queue:   options.Queue,
 		q:       q,
 	}, nil
