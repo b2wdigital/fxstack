@@ -13,6 +13,8 @@ import (
 	v2 "github.com/cloudevents/sdk-go/v2"
 
 	k "github.com/b2wdigital/fxstack/transport/client/kinesis"
+
+	"github.com/matryer/try"
 )
 
 type Client struct {
@@ -24,25 +26,33 @@ func NewClient(c k.Client, options *Options) *Client {
 	return &Client{client: c, options: options}
 }
 
-func (p *Client) Publish(ctx context.Context, outs []*v2.Event) error {
+func (p *Client) Publish(ctx context.Context, outs []*v2.Event) (err error) {
 
 	logger := gilog.FromContext(ctx).WithTypeOf(*p)
 
 	logger.Info("publishing to kinesis")
 
-	if len(outs) > 1 {
+	err = try.Do(func(attempt int) (bool, error) {
 
-		return p.multi(ctx, outs)
+		var err error
 
-	} else if len(outs) == 1 {
+		if len(outs) > 1 {
+			err = p.multi(ctx, outs)
+		} else if len(outs) == 1 {
+			err = p.single(ctx, outs)
+		}
 
-		return p.single(ctx, outs)
+		if err != nil {
+			return attempt < 5, errors.NewInternal(err, "could not be published on kinesis")
+		}
 
-	}
+		return false, nil
+
+	})
 
 	logger.Warnf("no messages were reported for posting")
 
-	return nil
+	return err
 }
 
 func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
