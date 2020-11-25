@@ -8,7 +8,7 @@ import (
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
 	ginats "github.com/b2wdigital/goignite/nats/v1"
-	v2 "github.com/cloudevents/sdk-go/v2"
+	"github.com/cloudevents/sdk-go/v2/event"
 	n "github.com/nats-io/nats.go"
 )
 
@@ -35,7 +35,7 @@ func (l *SubscriberListener) Subscribe(ctx context.Context) (*n.Subscription, er
 
 func (l *SubscriberListener) h(msg *n.Msg) {
 
-	in := v2.NewEvent()
+	in := event.New()
 	err := json.Unmarshal(msg.Data, &in)
 	if err != nil {
 

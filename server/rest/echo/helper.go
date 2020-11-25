@@ -4,11 +4,14 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/b2wdigital/fxstack/server/rest"
 	giecho "github.com/b2wdigital/goignite/echo/v4"
 	gilog "github.com/b2wdigital/goignite/log"
+	gipromecho "github.com/b2wdigital/goignite/prometheus/v1/ext/promecho/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Helper struct {
@@ -60,19 +63,27 @@ func (h *Helper) Serve() {
 
 	if rest.LiveEnabled() {
 
-		finish := make(chan bool)
+		wg := new(sync.WaitGroup)
+		wg.Add(2)
 
 		go func() {
 			giecho.Serve(h.ctx)
+			wg.Done()
 		}()
 
 		liveSrv := http.NewServeMux()
-		liveSrv.HandleFunc("/liveHandler", liveHandler)
+		liveSrv.HandleFunc(rest.LivePath(), liveHandler)
+
+		if gipromecho.IsEnabled() {
+			liveSrv.Handle(gipromecho.GetRoute(), promhttp.Handler())
+		}
+
 		go func() {
-			http.ListenAndServe(livePort(), liveSrv)
+			gilog.Fatal(http.ListenAndServe(livePort(), liveSrv))
+			wg.Done()
 		}()
 
-		<-finish
+		wg.Wait()
 	} else {
 		giecho.Serve(h.ctx)
 	}

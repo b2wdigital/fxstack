@@ -20,10 +20,11 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 
 	var inouts []*cloudevents.InOut
 
-	j, _ := json.Marshal(event)
-	gilog.Debug(string(j))
-
 	for _, record := range event.Records {
+
+		j, _ := json.Marshal(record)
+		logger.Debug(string(j))
+
 		var err error
 		in := v2.NewEvent()
 
@@ -34,14 +35,17 @@ func fromKinesis(parentCtx context.Context, event Event) []*cloudevents.InOut {
 				err = errors.NewNotValid(err, "could not decode kinesis record")
 			} else {
 				if err = in.SetData("", data); err != nil {
-					err = errors.NewNotValid(err, "could not decode kinesis record")
+					err = errors.NewNotValid(err, "could not set data in event")
 				}
 			}
 		}
 
 		in.SetType(record.EventName)
 
-		in.SetID(record.EventID)
+		if in.ID() == "" {
+			in.SetID(record.EventID)
+		}
+
 		in.SetSource(record.EventSource)
 
 		in.SetExtension("awsRequestID", lc.AwsRequestID)
