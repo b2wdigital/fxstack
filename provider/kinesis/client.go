@@ -59,7 +59,7 @@ func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
 
 	logger := gilog.FromContext(ctx).WithTypeOf(*p)
 
-	bulks := make(map[string][]*types.PutRecordsRequestEntry)
+	bulks := make(map[string][]types.PutRecordsRequestEntry)
 
 	for _, out := range outs {
 
@@ -77,7 +77,7 @@ func (p *Client) multi(ctx context.Context, outs []*v2.Event) (err error) {
 			return err
 		}
 
-		entry := &types.PutRecordsRequestEntry{
+		entry := types.PutRecordsRequestEntry{
 			Data:         rawMessage,
 			PartitionKey: aws.String(partitionKey),
 		}
