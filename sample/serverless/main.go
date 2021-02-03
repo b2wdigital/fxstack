@@ -51,7 +51,7 @@ func (*Handler) Handle(parentCtx context.Context, in v2.Event) (out *v2.Event, e
 	e.SetSubject("changeme")
 	e.SetSource("changeme")
 	e.SetType("changeme")
-	e.SetExtension("group", "changeme")
+	e.SetExtension("partitionkey", "changeme")
 	err = e.SetData("", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, errors.Internalf("unable set out event data"))

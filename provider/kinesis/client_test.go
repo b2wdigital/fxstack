@@ -29,7 +29,7 @@ func (s *ClientSuite) TestClient_Publish() {
 	event.SetSubject("changeme")
 	event.SetSource("changeme")
 	event.SetType("changeme")
-	event.SetExtension("group", "changeme")
+	event.SetExtension("partitionkey", "changeme")
 	event.SetData("", nil)
 
 	options, _ := DefaultOptions()

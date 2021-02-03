@@ -173,8 +173,8 @@ func (p *Client) partitionKey(out *v2.Event) (string, error) {
 	var pk string
 	exts := out.Extensions()
 
-	if group, ok := exts["group"]; ok {
-		pk = group.(string)
+	if partitionkey, ok := exts["partitionkey"]; ok {
+		pk = partitionkey.(string)
 	} else {
 		pk = "unknown"
 	}
