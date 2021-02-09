@@ -97,7 +97,7 @@ func (s *ClientSuite) TestClient_Publish() {
 			},
 			wantErr: true,
 			mock: func(client *mocks.Client) {
-				client.On("Publish", mock.Anything, mock.Anything).Return(errors.New("Error")).Times(1)
+				client.On("Publish", mock.Anything, mock.Anything).Return(errors.New("Error")).Times(5)
 			},
 		},
 	}
