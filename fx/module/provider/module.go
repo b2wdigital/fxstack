@@ -9,6 +9,7 @@ import (
 	"github.com/b2wdigital/fxstack/fx/module/provider/mock"
 	"github.com/b2wdigital/fxstack/fx/module/provider/nats"
 	"github.com/b2wdigital/fxstack/fx/module/provider/sns"
+	"github.com/b2wdigital/fxstack/fx/module/provider/sqs"
 	"github.com/b2wdigital/fxstack/wrapper/provider"
 	gilog "github.com/b2wdigital/goignite/log"
 	"go.uber.org/fx"
@@ -36,6 +37,8 @@ func EventModule() fx.Option {
 			mod = eventbus.EventModule()
 		} else if value == "sns" {
 			mod = sns.EventModule()
+		} else if value == "sqs" {
+			mod = sqs.EventModule()
 		} else {
 			mod = mock.EventModule()
 		}

@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v0.30.0
 	github.com/aws/aws-sdk-go-v2/service/kinesis v0.30.0
 	github.com/aws/aws-sdk-go-v2/service/sns v0.30.0
+	github.com/aws/aws-sdk-go-v2/service/sqs v0.30.0
 	github.com/b2wdigital/goignite v1.15.4
 	github.com/cloudevents/sdk-go/v2 v2.3.1
 	github.com/google/uuid v1.1.1
