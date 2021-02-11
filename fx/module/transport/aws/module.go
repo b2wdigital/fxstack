@@ -23,4 +23,3 @@ func AWSModule() fx.Option {
 
 	return options
 }
-

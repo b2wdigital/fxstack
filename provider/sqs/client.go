@@ -1,11 +1,12 @@
-package sns
+package sqs
 
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/sns"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/b2wdigital/fxstack/cloudevents"
 	"github.com/b2wdigital/goignite/errors"
 	gilog "github.com/b2wdigital/goignite/log"
@@ -13,7 +14,8 @@ import (
 	"github.com/matryer/try"
 	"golang.org/x/sync/errgroup"
 
-	k "github.com/b2wdigital/fxstack/transport/client/sns"
+	k "github.com/b2wdigital/fxstack/transport/client/sqs"
+	"github.com/b2wdigital/fxstack/util"
 )
 
 type Client struct {
@@ -28,7 +30,7 @@ func (p *Client) Publish(ctx context.Context, events []*v2.Event) error {
 
 	logger := gilog.FromContext(ctx).WithTypeOf(*p)
 
-	logger.Info("publishing to sns")
+	logger.Info("publishing to sqs")
 
 	if len(events) > 0 {
 
@@ -61,16 +63,13 @@ func (p *Client) send(parentCtx context.Context, events []*v2.Event) (err error)
 				return errors.Wrap(err, errors.Internalf("error on marshal. %s", err.Error()))
 			}
 
-			message := Message{
-				Default: string(rawMessage),
+			input := &sqs.SendMessageInput{
+				MessageBody: aws.String(string(rawMessage)),
+				QueueUrl:    aws.String(util.GetAwsUrl(event.Subject(), "sqs")),
 			}
-			messageBytes, _ := json.Marshal(message)
-			messageStr := string(messageBytes)
 
-			input := &sns.PublishInput{
-				Message:          aws.String(messageStr),
-				MessageStructure: aws.String("json"),
-				TopicArn:         aws.String(event.Subject()),
+			if group, ok := event.Extensions()["group"]; ok {
+				input.MessageGroupId = aws.String(fmt.Sprintf("%v", group))
 			}
 
 			logger.WithField("subject", event.Subject()).
@@ -81,7 +80,7 @@ func (p *Client) send(parentCtx context.Context, events []*v2.Event) (err error)
 				var err error
 				err = p.client.Publish(gctx, input)
 				if err != nil {
-					return attempt < 5, errors.NewInternal(err, "could not be published in sns")
+					return attempt < 5, errors.NewInternal(err, "could not be published in sqs")
 				}
 				return false, nil
 			})
@@ -122,8 +121,4 @@ func (p *Client) rawMessage(out *v2.Event) (rawMessage []byte, err error) {
 	}
 
 	return rawMessage, err
-}
-
-type Message struct {
-	Default string `json:"default"`
 }
