@@ -63,16 +63,11 @@ func (p *Client) send(parentCtx context.Context, events []*v2.Event) (err error)
 				return errors.Wrap(err, errors.Internalf("error on marshal. %s", err.Error()))
 			}
 
-			message := Message{
-				Default: string(rawMessage),
-			}
-			messageBytes, _ := json.Marshal(message)
-			messageStr := string(messageBytes)
-
 			input := &sqs.SendMessageInput{
-				MessageBody: aws.String(messageStr),
+				MessageBody: aws.String(string(rawMessage)),
 				QueueUrl:    aws.String(util.GetAwsUrl(event.Subject(), "sqs")),
 			}
+
 			if group, ok := event.Extensions()["group"]; ok {
 				input.MessageGroupId = aws.String(fmt.Sprintf("%v", group))
 			}
@@ -126,8 +121,4 @@ func (p *Client) rawMessage(out *v2.Event) (rawMessage []byte, err error) {
 	}
 
 	return rawMessage, err
-}
-
-type Message struct {
-	Default string `json:"default"`
 }
